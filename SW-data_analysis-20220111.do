@@ -40,12 +40,12 @@ egen htn = concat(HLTH_HTN_1_2019 HLTH_HTN_1_2020)
 tab dia
 tab htn
 
-replace dia = "1" if dia == ".1" | dia == "1."| dia == "11"| dia == "12"|  dia == "21"| dia == "51"
-replace dia = "2" if dia == ".." | dia == "5."| dia == "55"|dia == "2."| dia == "25"| dia == "22"| dia == "52"
+replace dia = "1" if strmatch(dia,"*1*")
+replace dia = "2" if !strmatch(dia,"*1*")
 
+replace htn = "1" if strmatch(htn,"*1*")
+replace htn = "2" if !strmatch(htn,"*1*")
 
-replace htn = "1" if htn == ".1" | htn == "1."| htn == "11"| htn == "12"| htn == "13"|  htn == "21"| htn == "31"
-replace htn = "2" if htn == ".." | htn == "3."| htn == "33"|htn == ".2"|htn == "2."| htn == "23"| htn == "22"| htn == "32" 
 
 destring dia htn, replace
 tab dia htn
@@ -82,7 +82,7 @@ replace PHQ_CAT = "Severe depression" if PHQ > 19
 
 forvalues y = 2019/2020{
 	gen depressed_`y' = .
-	replace depressed_`y' = 1 if PHQ_`y' >= 8
+	replace depressed_`y' = 1 if PHQ_`y' >= 8 & PHQ_`y' < . 
 	replace depressed_`y' = 0 if PHQ_`y' < 8
 	tab depressed_`y'
 }
@@ -92,8 +92,8 @@ tab depressed_2019 depressed_2020
 gen incidence_2020 = depressed_2019 if depressed_2019 < 1
 replace incidence_2020 = 1 if depressed_2019 == 0 & depressed_2020 == 1
 replace incidence_2020 = . if depressed_2019 ==1
+replace incidence_2020 = . if depressed_2020 ==. 
 tab incidence_2020
-
 
 
 
